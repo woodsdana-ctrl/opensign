@@ -12,3 +12,12 @@
 - Verified production build, persistent API integration, and Chromium dashboard-to-player workflow, including timing, looping, live changes, and fallback behavior.
 - Reviewed desktop/mobile presentation and checked mobile overflow.
 - Upgraded Sharp to 0.35.5; dependency audit reports zero known vulnerabilities.
+
+## 0.2.0 — 2026-10-14
+
+- Added portable native executables with the Node runtime and image-processing libraries included.
+- Added Mac launchers that open the dashboard in the browser without npm or Node installation.
+- Store packaged Mac data in Application Support so replacing the application folder preserves it.
+- Added Apple Silicon and Intel build jobs, packaged-executable browser tests, ZIP archives, checksums, and release publication.
+- Added automated build/API/browser checks for normal source changes.
+- Documented first-launch macOS approval and the limitations of unsigned local builds.

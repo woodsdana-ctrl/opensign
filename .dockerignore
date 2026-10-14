@@ -5,3 +5,6 @@ data
 dist
 test-results
 playwright-report
+
+.release-build
+release

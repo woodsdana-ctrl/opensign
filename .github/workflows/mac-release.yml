@@ -1,0 +1,89 @@
+name: Build Mac downloads
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and test Mac ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          architecture: ${{ matrix.arch }}
+          cache: npm
+      - name: Check native architecture
+        env:
+          EXPECTED_ARCH: ${{ matrix.arch }}
+        run: node -e 'if (process.arch !== process.env.EXPECTED_ARCH) process.exit(1)'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build portable executable
+        run: npm run package
+      - name: Test API and persistence
+        run: npm test
+      - name: Install Chromium
+        run: npx playwright install chromium
+      - name: Test the packaged executable in a browser
+        run: npm run test:e2e
+        env:
+          TEST_PORT: "3101"
+          PLAYWRIGHT_SERVER_EXECUTABLE: ${{ github.workspace }}/release/OpenSign-macos-${{ matrix.arch }}/OpenSign
+      - name: Create download and checksum
+        env:
+          PACKAGE_NAME: OpenSign-macos-${{ matrix.arch }}
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent "release/$PACKAGE_NAME" "release/$PACKAGE_NAME.zip"
+          cd release
+          shasum -a 256 "$PACKAGE_NAME.zip" > "$PACKAGE_NAME.zip.sha256"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OpenSign-macos-${{ matrix.arch }}
+          path: |
+            release/*.zip
+            release/*.sha256
+          if-no-files-found: error
+          retention-days: 14
+      - name: Save test failure details
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-test-failure-${{ matrix.arch }}
+          path: test-results/
+          if-no-files-found: ignore
+
+  publish:
+    name: Publish tested downloads
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: OpenSign-macos-*
+          path: release-downloads
+          merge-multiple: true
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: gh release create "$RELEASE_TAG" release-downloads/* --verify-tag --title "OpenSign $RELEASE_TAG — Mac downloads" --notes-file docs/RELEASE-NOTES.md

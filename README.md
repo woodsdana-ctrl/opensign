@@ -2,6 +2,29 @@
 
 Self-hosted image signage for Bemidji Area Schools. Version 1 includes a real media library, persistent playlists, screen assignment, and a separate browser player.
 
+## Download and run on a Mac
+
+[Download OpenSign from GitHub Releases](https://github.com/woodsdana-ctrl/opensign/releases/latest).
+
+Choose **macos-arm64** for an Apple M-series chip, or **macos-x64** for an Intel Mac. Unzip the entire folder, then double-click **Start OpenSign.command**. The bundled executable opens the dashboard in your browser; Node.js, npm, and Docker are not required. Keep the Terminal window running and press Ctrl+C to stop.
+
+Data is stored separately in `~/Library/Application Support/OpenSign/`, so replacing the application folder does not erase playlists or images. These builds are not Apple Developer ID signed or notarized; macOS may require **Privacy & Security → Open Anyway** approval. See [Mac startup instructions](docs/DOWNLOAD.md).
+
+This runs locally on your Mac. It does not make an always-on staff website. The local prototype still requires authentication, permissions, pairing, HTTPS, and a security review before network deployment.
+
+## GitHub checks and releases
+
+GitHub Actions builds and tests source changes. Version tags (`v*`) also build native Mac executables on Apple Silicon and Intel runners, run the browser demonstration against each actual executable, and publish ZIP downloads and SHA-256 checksums only after both builds pass. A manual packaging workflow produces downloadable test artifacts without publishing a release.
+
+To build a portable package from source on your Mac:
+
+```sh
+npm ci
+npm run package
+```
+
+The result is in `release/OpenSign-macos-<architecture>/`. It contains the executable, production libraries, frontend, startup launcher, instructions, and runtime license notices. Mac builds are ad-hoc signed for binary integrity; that is different from Apple Developer ID signing and notarization. Interactive Finder/Gatekeeper approval still requires manual testing on a downloaded package.
+
 ## Run locally
 
 Install **Node.js 24 LTS**. In this project folder:
@@ -48,7 +71,7 @@ npm run test:e2e
 
 The integration test uses temporary database and upload directories. It checks actual upload decoding, invalid uploads, name/duration validation, ordering, assignment, content changes, cross-origin write rejection, and persistence across an application restart. The browser test creates three images through the dashboard, previews and assigns the playlist, uses a separate player page, checks 10-second rotation and looping with a controlled browser clock, reorders the playlist, changes timing, and verifies automatic updates and missing-image fallback.
 
-Browser tests use a unique temporary directory under `/tmp/opensign-browser-*` each run. These test-only directories can be removed afterward. The test server requires port 3001 to be free. Manual checks still needed: physical TV full-screen behavior, long-running browser stability, and actual district hardware/network operation.
+Browser tests use a unique temporary directory under `/tmp/opensign-browser-*` each run. These test-only directories can be removed afterward. The test server requires port 3001 to be free, or set `TEST_PORT` to another free port (for example, `TEST_PORT=3101 npm run test:e2e` on Linux/macOS). Manual checks still needed: physical TV full-screen behavior, long-running browser stability, and actual district hardware/network operation.
 
 ## Docker
 
