@@ -6,7 +6,7 @@ Self-hosted image signage for Bemidji Area Schools, with straightforward staff t
 
 ## Current development phase
 
-Version 1 MVP verified; preparing downloadable Mac executables for Apple Silicon and Intel.
+Version 0.2.0 released with tested Mac downloads for Apple Silicon and Intel.
 
 ## Completed functionality
 
@@ -30,10 +30,13 @@ Version 1 MVP verified; preparing downloadable Mac executables for Apple Silicon
 - Desktop and mobile screenshots reviewed; mobile dashboard has no horizontal overflow.
 - Dependency audit reports zero known vulnerabilities after upgrading Sharp to its patched release.
 - Development servers start, and dashboard/API proxy endpoints return HTTP 200.
+- GitHub Actions source verification passed.
+- Actual Apple Silicon and Intel Mac executables each passed API/persistence and packaged-executable browser tests on GitHub Mac runners.
+- Release v0.2.0 published both ZIP downloads and SHA-256 checksums: https://github.com/woodsdana-ctrl/opensign/releases/tag/v0.2.0 .
 
 ## Features in progress
 
-- Portable Mac builds, packaged-executable browser verification, and GitHub release publication. The product owner chose local Mac downloads instead of hosted deployment.
+- Product owner first-launch acceptance on a downloaded Mac package. Local Mac downloads replaced the proposed hosted deployment.
 - Product owner acceptance and physical TV testing.
 
 ## Known issues and limitations
@@ -47,7 +50,7 @@ Version 1 MVP verified; preparing downloadable Mac executables for Apple Silicon
 
 ## Upcoming milestones
 
-1. Publish tested Mac ZIP downloads; product owner verifies first launch and the Test TV demonstration, including a restart.
+1. Product owner verifies downloaded Mac first launch, macOS approval, and the Test TV demonstration, including a restart.
 2. Add real authentication and server-side district/school permissions.
 3. Add secure pairing, HTTPS, and complete a security review before a district network pilot.
 4. Consider screen health, schedules, and offline caching after the secure pilot.
